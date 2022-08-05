@@ -23,6 +23,21 @@ def keyboard_create_quiz():
     markup.add(btn1, btn2, btn3, btn4)
     return markup
 
+def keyboard_add_text():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    btn1 = types.InlineKeyboardButton(text='Сохранить вопрос', callback_data='text_1')
+    markup.add(btn1, )
+    return markup
+
+def save_question():
+    @bot.message_handler(content_types=["text"])
+    def repeat_messages(message):  # Название функции не играет никакой роли
+        markup = keyboard_add_text()
+        bot.send_message(message.chat.id, message.text, reply_markup=markup)
+
+        print(message.id)
+
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -31,41 +46,37 @@ def start(message):
     bot.send_message(message.chat.id, send_mess, parse_mode='html', reply_markup=markup)
 
 
-
+# функция ожидает колбэки и выполняется при их наличии
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
-    markup = keyboard_create_quiz()
+    markup_quiz = keyboard_create_quiz()
+    markup_text = keyboard_add_text()
+
     if call.message:
         if call.data == 'main_1':
-            bot.send_message(call.message.chat.id, 'Переходим к созданию вопроса', reply_markup=markup)
+            bot.send_message(call.message.chat.id, 'Переходим к созданию вопроса', reply_markup=markup_quiz)
         if call.data == 'main_2':
-            bot.send_message(call.message.chat.id, 'Корректируем вопрос', reply_markup=markup)
+            bot.send_message(call.message.chat.id, 'Корректируем вопрос', reply_markup=markup_quiz)
         if call.data == 'main_3':
-            bot.send_message(call.message.chat.id, 'Публикуем вопрос', reply_markup=markup)
+            bot.send_message(call.message.chat.id, 'Публикуем вопрос', reply_markup=markup_quiz)
+        if call.data == 'quiz_1':
+            bot.send_message(call.message.chat.id, 'Отправьте ваш вопрос а потом нажмите кнопку ниже')
+            save_question()
+        if call.data == 'text_1':
+            bot.send_message(call.message.chat.id, 'Вопрос принят', reply_markup=markup_quiz)
+            print(call.message.text)
     #print(call.data)
-    #print(call.message)
 
-quiz = {}
+
+quiz_text = ''
+quiz_description = ''
+quiz_answer = []
+quiz_img = ''
+
 
 def creat_text():
     pass
 
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_quiz(call):
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    btn1 = types.InlineKeyboardButton(text='Сохранить', callback_data='21')
-    markup.add(btn1, )
-    if call.message:
-        if call.data == 'quiz_1':
-            bot.send_message(call.message.chat.id, 'Отправьте ваш вопрос а потом нажмите кнопку ниже', reply_markup=markup)
-        if call.data == 'quiz_2':
-            pass
-        if call.data == 'quiz_3':
-            pass
-        if call.data == 'quiz_4':
-            pass
-    print(call.message)
 
 
 if __name__ == '__main__':
